@@ -1,0 +1,57 @@
+package com.example.steps;
+ 
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import io.restassured.response.Response;
+ 
+import java.util.Map;
+ 
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
+ 
+public class PetStoreSteps {
+ 
+    private Response response;
+private String BASE_URL = "https://petstore.swagger.io/v2";
+ 
+    @Given("the PetStore API is available")
+    public void the_PetStore_API_is_available() {
+        // You can implement a check here to ensure the API is available
+    }
+ 
+    @When("I send a POST request to \"/store/order\" with the following order details")
+    public void i_send_a_POST_request_with_order_details(io.cucumber.datatable.DataTable dataTable) {
+        Map<String, Object> orderDetails = dataTable.asMap(String.class, Object.class);
+ 
+        response = given()
+                    .contentType("application/json")
+                    .body(orderDetails)
+                   .when()
+                    .post(BASE_URL + "/store/order");
+    }
+ 
+    @Then("the response code should be {int}")
+    public void the_response_code_should_be(int statusCode) {
+        response.then().statusCode(statusCode);
+    }
+ 
+    @Then("the response body should contain the order details")
+    public void the_response_body_should_contain_order_details(io.cucumber.datatable.DataTable dataTable) {
+        Map<String, Object> expectedOrderDetails = dataTable.asMap(String.class, Object.class);
+ 
+        for (String key : expectedOrderDetails.keySet()) {
+            response.then().body(key, equalTo(expectedOrderDetails.get(key)));
+        }
+    }
+ 
+    @Given("an order with ID {string} exists")
+    public void an_order_with_ID_exists(String orderId) {
+        // Optionally, you can create the order here if it doesn't exist
+    }
+ 
+    @When("I send a GET request to \"/store/order/{string}\"")
+    public void i_send_a_GET_request(String orderId) {
+        response = when().get(BASE_URL + "/store/order/" + orderId);
+    }
+}

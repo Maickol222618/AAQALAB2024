@@ -1,0 +1,21 @@
+Feature: PetStore API Order Management
+ 
+  Background:
+    Given the PetStore API is available
+ 
+  Scenario: Create an order
+    When I send a POST request to "/store/order" with the following order details
+      | id   | petId | quantity | shipDate            | status | complete |
+      | 1    | 101   | 2        | 2024-08-08T14:30:00 | placed | true     |
+    Then the response code should be 200
+    And the response body should contain the order details
+      | id   | petId | quantity | shipDate            | status | complete |
+      | 1    | 101   | 2        | 2024-08-08T14:30:00 | placed | true     |
+ 
+  Scenario: Get an order by ID
+    Given an order with ID "1" exists
+    When I send a GET request to "/store/order/1"
+    Then the response code should be 200
+    And the response body should contain the order details
+      | id   | petId | quantity | shipDate            | status | complete |
+      | 1    | 101   | 2        | 2024-08-08T14:30:00 | placed | true     |
